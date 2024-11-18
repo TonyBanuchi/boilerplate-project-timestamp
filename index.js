@@ -13,6 +13,11 @@ app.use(cors({optionsSuccessStatus: 200}));  // some legacy browsers choke on 20
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
 
+app.use((req, res, next)=>{
+  console.log(req.url);
+  next();
+})
+
 // http://expressjs.com/en/starter/basic-routing.html
 app.get("/", function (req, res) {
   res.sendFile(__dirname + '/views/index.html');
@@ -39,7 +44,10 @@ app.get("/api/:dateString?", (req, res, next) => {
       }
     }
 
-    if(dateValue.toString() === 'Invalid Date'){throw new Error('Invalid Date');}else{
+    if(dateValue.toString() === 'Invalid Date'){
+      res.json({error: 'Invalid Date'});
+      return;
+    } else {
       res.json({
         unix: (Math.floor(dateValue.getTime())),
         utc: (dateValue.toUTCString())
@@ -47,7 +55,7 @@ app.get("/api/:dateString?", (req, res, next) => {
       return;
     }
   } catch(e){
-    res.json({error: e})
+    console.error(e);
     return;
   }
 })
